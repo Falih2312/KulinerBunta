@@ -1,0 +1,32 @@
+name: Validate static site
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify required files exist
+        run: |
+          test -f index.html
+          test -f manifest.json
+          test -f sw.js
+          test -f css/styles.css
+          test -f js/app.js
+
+      - name: Validate HTML entry points
+        run: |
+          grep -q "<!DOCTYPE html>" index.html
+          grep -q "<!DOCTYPE html>" offline.html
+          grep -q "<!DOCTYPE html>" app-pembeli/index.html
+          grep -q "<!DOCTYPE html>" app-merchant/index.html
+          grep -q "<!DOCTYPE html>" app-kurir/index.html
+          grep -q "<!DOCTYPE html>" app-admin/index.html

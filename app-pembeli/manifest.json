@@ -1,0 +1,22 @@
+{
+  "name": "KulinerBunta Pembeli - PWA Pelanggan",
+  "short_name": "KB Pembeli",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F8F9FA",
+  "theme_color": "#D62828",
+  "description": "Aplikasi Web PWA Mandiri Khusus Pembeli & Wisatawan Kecamatan Bunta. Jelajahi kuliner khas Bunta, pesan online/COD, bayar QRIS.",
+  "icons": [
+    {
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=192&h=192&fit=crop",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=512&h=512&fit=crop",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

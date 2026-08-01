@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KulinerBunta.id - Koneksi Terputus (Offline)</title>
+  <meta name="theme-color" content="#D62828">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-amber-400 selection:text-slate-950">
+
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 px-4 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-red-600 to-amber-500 flex items-center justify-center text-white shadow-lg">
+          <i data-lucide="utensils" class="w-5 h-5 text-amber-300"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold font-display text-white">KulinerBunta<span class="text-red-500">.id</span></h1>
+          <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block -mt-1">PWA Mode Luring</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-md mx-auto px-4 py-16 text-center space-y-6 flex-grow flex flex-col justify-center items-center">
+    <div class="w-24 h-24 rounded-full bg-red-950/60 border-2 border-red-600/50 flex items-center justify-center text-red-500 animate-pulse shadow-2xl">
+      <i data-lucide="wifi-off" class="w-12 h-12"></i>
+    </div>
+
+    <div class="space-y-2">
+      <h2 class="text-2xl font-extrabold font-display text-white">Koneksi Internet Terputus</h2>
+      <p class="text-xs text-slate-400 leading-relaxed">
+        Anda sedang tidak terhubung ke jaringan internet. Beberapa fitur memerlukan koneksi aktif untuk memperbarui data transaksi.
+      </p>
+    </div>
+
+    <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-left w-full space-y-2 text-xs">
+      <div class="flex items-center gap-2 text-amber-400 font-bold">
+        <i data-lucide="info" class="w-4 h-4"></i>
+        <span>Informasi Akses Luring</span>
+      </div>
+      <p class="text-slate-400">
+        Halaman yang telah Anda buka sebelumnya tetap tersedia dari memori simpan lokal PWA.
+      </p>
+    </div>
+
+    <button onclick="window.location.reload()" class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-red-600 to-amber-500 text-white font-extrabold text-sm shadow-xl hover:opacity-90 transition flex items-center justify-center gap-2">
+      <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+      <span>Coba Hubungkan Ulang</span>
+    </button>
+  </main>
+
+  <footer class="border-t border-slate-800 bg-slate-900/60 py-4 px-4 text-center text-xs text-slate-500">
+    KulinerBunta.id &copy; 2026 — Platform Kuliner Digital Kecamatan Bunta
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    window.addEventListener('online', () => {
+      window.location.reload();
+    });
+  </script>
+</body>
+</html>

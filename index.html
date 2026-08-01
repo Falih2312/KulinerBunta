@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KulinerBunta.id — Platform Digital Kuliner Bunta</title>
+  
+  <meta name="description" content="Platform Digital Perdagangan Kuliner & UMKM Kecamatan Bunta, Kabupaten Banggai, Sulawesi Tengah.">
+  <meta name="theme-color" content="#D62828">
+  <link rel="manifest" href="./manifest.json">
+
+  <!-- Preconnect & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- CSS Framework & Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            bunta: {
+              red: '#D62828',
+              gold: '#F4B400',
+              dark: '#0F172A',
+              surface: '#1E293B'
+            }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            display: ['Outfit', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-bunta-gold selection:text-slate-950">
+
+  <!-- Offline Banner Indicator -->
+  <div id="offline-banner" class="hidden bg-amber-500 text-slate-950 px-4 py-2 text-xs font-bold text-center flex items-center justify-center gap-2 shadow-md">
+    <i data-lucide="wifi-off" class="w-4 h-4"></i>
+    <span>Modus Luring (Offline): Anda sedang menjelajahi platform dari cache lokal PWA.</span>
+  </div>
+
+  <!-- Header Navigation Bar -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      
+      <!-- Brand Logo & Platform Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-bunta-gradient flex items-center justify-center text-white font-black text-xl shadow-lg shadow-red-900/40">
+          KB
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-display font-extrabold text-white tracking-tight">
+              Kuliner<span class="text-bunta-red">Bunta</span><span class="text-bunta-gold">.id</span>
+            </h1>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-800 text-bunta-gold border border-slate-700">
+              v1.0 Baseline
+            </span>
+          </div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block -mt-0.5">
+            Kecamatan Bunta, Kab. Banggai, Sulawesi Tengah
+          </span>
+        </div>
+      </div>
+
+      <!-- Auth State Control & Navigation -->
+      <div class="flex items-center gap-3">
+        <!-- Guest View Controls -->
+        <div id="header-guest-view" class="flex items-center gap-2">
+          <button onclick="openAuthModal('login')" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold border border-slate-700 transition">
+            Masuk
+          </button>
+          <button onclick="openAuthModal('register')" class="px-3.5 py-1.5 rounded-xl bg-bunta-gradient text-white text-xs font-extrabold shadow-md hover:opacity-90 transition">
+            Daftar Akun
+          </button>
+        </div>
+
+        <!-- Logged-in User Drawer Button -->
+        <div id="header-user-view" class="hidden flex items-center gap-3">
+          <div class="text-right hidden sm:block">
+            <span id="user-display-name" class="block text-xs font-extrabold text-white">Nama Pengguna</span>
+            <span id="user-display-role" class="block text-[10px] font-bold text-bunta-gold">Peran Pengguna</span>
+          </div>
+          <button onclick="handleLogout()" title="Keluar" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-red-400 border border-slate-700 transition">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section & Ekosistem App Entries -->
+  <main class="max-w-7xl mx-auto px-4 py-8 flex-grow space-y-12">
+    
+    <!-- Hero Banner -->
+    <div class="relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 p-8 sm:p-12 shadow-2xl text-center space-y-6">
+      <div class="absolute -top-24 -left-24 w-72 h-72 bg-bunta-red/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-bunta-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="max-w-3xl mx-auto space-y-4 relative z-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-bunta-gold text-xs font-extrabold">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+          <span>Resmi Beroperasi di Kecamatan Bunta</span>
+        </div>
+        <h2 class="text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight leading-tight">
+          Platform Perdagangan Digital &<br>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-bunta-gold via-amber-400 to-bunta-red">
+            Kuliner Khas Kecamatan Bunta
+          </span>
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl mx-auto">
+          Menghubungkan masyarakat, wisatawan, UMKM kuliner lokal, dan armada kurir dalam satu ekosistem PWA terpadu berkinerja tinggi.
+        </p>
+      </div>
+    </div>
+
+    <!-- PWA Portals Selection Grid (SP-001 s.d SP-008) -->
+    <div class="space-y-6">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xl font-display font-extrabold text-white flex items-center gap-2">
+          <i data-lucide="layout-grid" class="w-5 h-5 text-bunta-gold"></i>
+          <span>Portal Aplikasi Terintegrasi</span>
+        </h3>
+        <span class="text-xs text-slate-400 font-bold">Role-Based Access Control (RBAC)</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- App Portal 1: Consumer & Tourists PWA -->
+        <div onclick="navigateProtectedPortal('./app-pembeli/index.html', 'pelanggan')" class="cursor-pointer bg-slate-900/90 rounded-3xl p-6 border border-slate-800 hover:border-bunta-red transition duration-300 flex flex-col justify-between shadow-xl group">
+          <div class="space-y-4">
+            <div class="w-14 h-14 rounded-2xl bg-bunta-red/20 border border-bunta-red/40 text-bunta-red flex items-center justify-center text-2xl font-black group-hover:scale-110 transition duration-300 shadow-md">
+              <i data-lucide="shopping-bag" class="w-7 h-7 text-bunta-gold"></i>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-bunta-red text-white">PWA 1</span>
+                <span class="text-[10px] font-bold text-slate-400">Pembeli & Wisatawan</span>
+              </div>
+              <h4 class="text-lg font-extrabold font-display text-white group-hover:text-bunta-gold transition">Aplikasi Pembeli</h4>
+              <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                Jelajahi katalog makanan, pencarian live, isi keranjang, checkout, dan pantau pengiriman.
+              </p>
+            </div>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs font-extrabold text-bunta-gold">
+            <span>Buka PWA Pembeli</span>
+            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
+          </div>
+        </div>
+
+        <!-- App Portal 2: Merchant PWA -->
+        <div onclick="navigateProtectedPortal('./app-merchant/index.html', 'merchant')" class="cursor-pointer bg-slate-900/90 rounded-3xl p-6 border border-slate-800 hover:border-bunta-gold transition duration-300 flex flex-col justify-between shadow-xl group">
+          <div class="space-y-4">
+            <div class="w-14 h-14 rounded-2xl bg-bunta-gold/20 border border-bunta-gold/40 text-bunta-gold flex items-center justify-center text-2xl font-black group-hover:scale-110 transition duration-300 shadow-md">
+              <i data-lucide="store" class="w-7 h-7 text-bunta-gold"></i>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-bunta-gold text-slate-950">PWA 2</span>
+                <span class="text-[10px] font-bold text-slate-400">Mitra UMKM Kuliner</span>
+              </div>
+              <h4 class="text-lg font-extrabold font-display text-white group-hover:text-bunta-gold transition">Aplikasi Merchant</h4>
+              <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                Kelola menu makanan, kelola stok hidangan, dan terima pesanan masuk secara real-time.
+              </p>
+            </div>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs font-extrabold text-bunta-gold">
+            <span>Buka PWA Merchant</span>
+            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
+          </div>
+        </div>
+
+        <!-- App Portal 3: Courier PWA -->
+        <div onclick="navigateProtectedPortal('./app-kurir/index.html', 'kurir')" class="cursor-pointer bg-slate-900/90 rounded-3xl p-6 border border-slate-800 hover:border-emerald-500 transition duration-300 flex flex-col justify-between shadow-xl group">
+          <div class="space-y-4">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-2xl font-black group-hover:scale-110 transition duration-300 shadow-md">
+              <i data-lucide="bike" class="w-7 h-7 text-emerald-400"></i>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500 text-slate-950">PWA 3</span>
+                <span class="text-[10px] font-bold text-slate-400">Armada Kurir Lokal</span>
+              </div>
+              <h4 class="text-lg font-extrabold font-display text-white group-hover:text-emerald-400 transition">Aplikasi Kurir</h4>
+              <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                Daftar antrean pengantaran hidangan, pickup hidangan, dan pembaruan lokasi pengiriman.
+              </p>
+            </div>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs font-extrabold text-emerald-400">
+            <span>Buka PWA Kurir</span>
+            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
+          </div>
+        </div>
+
+        <!-- App Portal 4: Admin Governance PWA (SP-008) -->
+        <div onclick="navigateProtectedPortal('./app-admin/index.html', 'admin')" class="cursor-pointer bg-slate-900/90 rounded-3xl p-6 border border-slate-800 hover:border-indigo-500 transition duration-300 flex flex-col justify-between shadow-xl group">
+          <div class="space-y-4">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 flex items-center justify-center text-2xl font-black group-hover:scale-110 transition duration-300 shadow-md">
+              <i data-lucide="shield-check" class="w-7 h-7 text-indigo-400"></i>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500 text-white">PWA 4</span>
+                <span class="text-[10px] font-bold text-slate-400">Admin Operasional</span>
+              </div>
+              <h4 class="text-lg font-extrabold font-display text-white group-hover:text-indigo-400 transition">Admin Portal</h4>
+              <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                Dashboard KPI operasional, kontrol merchant, kurir, monitoring transaksi, dan audit log.
+              </p>
+            </div>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs font-extrabold text-indigo-400">
+            <span>Buka Admin Portal</span>
+            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Integrated Auth Modal Window (SP-002) -->
+  <div id="auth-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div onclick="closeAuthModal()" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md modal-backdrop"></div>
+    <div class="relative w-full max-w-md rounded-3xl glass-modal p-6 sm:p-8 shadow-2xl z-10 modal-container border border-slate-700/80">
+      <button onclick="closeAuthModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- View 1: Login Form -->
+      <div id="auth-view-login" class="space-y-6">
+        <div class="text-center space-y-1">
+          <div class="w-12 h-12 rounded-2xl bg-bunta-red/20 border border-bunta-red/40 text-bunta-red flex items-center justify-center mx-auto mb-2 shadow-md">
+            <i data-lucide="log-in" class="w-6 h-6 text-bunta-gold"></i>
+          </div>
+          <h3 class="text-2xl font-display font-extrabold text-white">Masuk ke Akun</h3>
+          <p class="text-xs text-slate-400">Pilih peran akun dan masukkan kredensial Anda</p>
+        </div>
+
+        <form onsubmit="handleLoginSubmit(event)" class="space-y-4 text-xs">
+          <div class="space-y-1 text-left">
+            <label class="font-extrabold text-slate-300 block">Alamat Email / Telepon</label>
+            <input type="text" name="email" required placeholder="contoh: pengguna@kulinerbunta.id" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white placeholder-slate-500 focus:border-bunta-gold focus:outline-none">
+          </div>
+
+          <div class="space-y-1 text-left">
+            <label class="font-extrabold text-slate-300 block">Kata Sandi</label>
+            <input type="password" name="password" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white placeholder-slate-500 focus:border-bunta-gold focus:outline-none">
+          </div>
+
+          <div class="space-y-1 text-left">
+            <label class="font-extrabold text-slate-300 block">Peran Akses (Role)</label>
+            <select name="role" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white focus:border-bunta-gold focus:outline-none">
+              <option value="pelanggan">Pembeli & Wisatawan (PWA 1)</option>
+              <option value="merchant">Mitra UMKM Kuliner (PWA 2)</option>
+              <option value="kurir">Armada Kurir Lokal (PWA 3)</option>
+              <option value="admin">Administrator Operasional (PWA 4)</option>
+            </select>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] pt-1">
+            <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+              <input type="checkbox" name="remember" checked class="rounded border-slate-700 bg-slate-900 text-bunta-gold focus:ring-0">
+              <span>Ingat Saya</span>
+            </label>
+            <button type="button" onclick="switchAuthView('forgot')" class="text-bunta-gold hover:underline font-bold">Lupa Sandi?</button>
+          </div>
+
+          <button type="submit" class="w-full py-3.5 rounded-xl bg-bunta-gradient text-white font-extrabold shadow-lg hover:opacity-90 transition flex items-center justify-center gap-2">
+            <i data-lucide="arrow-right-circle" class="w-4 h-4"></i>
+            <span>Masuk Sekarang</span>
+          </button>
+        </form>
+
+        <div class="text-center text-xs text-slate-400 border-t border-slate-800 pt-4">
+          Belum memiliki akun? <button onclick="switchAuthView('register')" class="text-bunta-gold font-extrabold hover:underline">Daftar Sekarang</button>
+        </div>
+      </div>
+
+      <!-- View 2: Register Form -->
+      <div id="auth-view-register" class="hidden space-y-6">
+        <div class="text-center space-y-1">
+          <div class="w-12 h-12 rounded-2xl bg-bunta-gold/20 border border-bunta-gold/40 text-bunta-gold flex items-center justify-center mx-auto mb-2 shadow-md">
+            <i data-lucide="user-plus" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-2xl font-display font-extrabold text-white">Daftar Akun Baru</h3>
+          <p class="text-xs text-slate-400">Bergabunglah dalam platform digital KulinerBunta.id</p>
+        </div>
+
+        <form onsubmit="handleRegisterSubmit(event)" class="space-y-4 text-xs">
+          <div class="space-y-1 text-left">
+            <label class="font-extrabold text-slate-300 block">Nama Lengkap</label>
+            <input type="text" name="name" required placeholder="Nama Anda..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white placeholder-slate-500 focus:border-bunta-gold focus:outline-none">
+          </div>
+
+          <div class="space-y-1 text-left">
+            <label class="font-extrabold text-slate-300 block">Email / No. HP WhatsApp</label>
+            <input type="text" name="email" required placeholder="08XXXXXXXXXX atau email@..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white placeholder-slate-500 focus:border-bunta-gold focus:outline-none">
+          </div>
+
+          <div class="space-y-1 text-left">
+            <label class="font-extrabold text-slate-300 block">Daftar Sebagai</label>
+            <select name="role" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white focus:border-bunta-gold focus:outline-none">
+              <option value="pelanggan">Pembeli & Wisatawan</option>
+              <option value="merchant">Mitra UMKM Kuliner (Penyedia Hidangan)</option>
+              <option value="kurir">Armada Kurir Lokal Bunta</option>
+            </select>
+          </div>
+
+          <button type="submit" class="w-full py-3.5 rounded-xl bg-bunta-gradient text-white font-extrabold shadow-lg hover:opacity-90 transition flex items-center justify-center gap-2">
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+            <span>Daftar Akun</span>
+          </button>
+        </form>
+
+        <div class="text-center text-xs text-slate-400 border-t border-slate-800 pt-4">
+          Sudah memiliki akun? <button onclick="switchAuthView('login')" class="text-bunta-gold font-extrabold hover:underline">Masuk</button>
+        </div>
+      </div>
+
+      <!-- View 3: Forgot Password -->
+      <div id="auth-view-forgot" class="hidden space-y-6">
+        <div class="text-center space-y-1">
+          <h3 class="text-2xl font-display font-extrabold text-white">Pemulihan Sandi</h3>
+          <p class="text-xs text-slate-400">Masukkan email/nomor telepon terdaftar Anda</p>
+        </div>
+
+        <form onsubmit="handleForgotSubmit(event)" class="space-y-4 text-xs">
+          <div class="space-y-1 text-left">
+            <label class="font-extrabold text-slate-300 block">Email / Telepon</label>
+            <input type="text" name="email" required placeholder="email@..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white focus:border-bunta-gold focus:outline-none">
+          </div>
+
+          <button type="submit" class="w-full py-3.5 rounded-xl bg-slate-800 text-white font-extrabold border border-slate-700 hover:bg-slate-700 transition">
+            Kirim Tautan Pemulihan
+          </button>
+        </form>
+
+        <div class="text-center text-xs text-slate-400">
+          <button onclick="switchAuthView('login')" class="text-bunta-gold font-bold hover:underline">Kembali ke Layar Masuk</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <footer class="border-t border-slate-800 bg-slate-900/60 py-8 px-4">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+      <div>
+        <span class="font-extrabold text-white">KulinerBunta.id</span> &copy; 2026 — Dikelola secara resmi untuk Kecamatan Bunta, Kab. Banggai, Sulawesi Tengah.
+      </div>
+      <div class="flex items-center gap-4 text-[11px]">
+        <a href="./docs/SP-008_ADMINISTRATION_AND_OPERATIONAL_GOVERNANCE_PACKAGE.md" class="hover:text-bunta-gold transition">SP-008 Certified Spec</a>
+        <a href="./docs/KB-001_KNOWLEDGE_BASE_MASTER_INDEX.md" class="hover:text-bunta-gold transition">Knowledge Base Index</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- App Scripts -->
+  <script>
+    lucide.createIcons();
+  </script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

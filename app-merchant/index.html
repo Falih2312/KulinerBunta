@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KulinerBunta.id — Merchant PWA & Order Management</title>
+  
+  <meta name="description" content="Portal Merchant UMKM Kuliner Bunta. Kelola menu makanan, terima pesanan masuk, dan pantau usaha harian.">
+  <meta name="theme-color" content="#D62828">
+  <link rel="manifest" href="./manifest.json">
+
+  <!-- Preconnect & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- CSS Framework & Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            bunta: {
+              red: '#D62828',
+              gold: '#F4B400',
+              dark: '#0F172A',
+              surface: '#1E293B'
+            }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            display: ['Outfit', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="bg-slate-950 text-white font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-bunta-gold selection:text-slate-950">
+
+  <!-- Offline Banner Indicator -->
+  <div id="offline-banner" class="hidden bg-amber-500 text-slate-950 px-4 py-2 text-xs font-bold text-center flex items-center justify-center gap-2 shadow-md">
+    <i data-lucide="wifi-off" class="w-4 h-4"></i>
+    <span>Modus Luring (Offline): Menampilkan data katalog dari cache lokal PWA.</span>
+  </div>
+
+  <!-- Header Section -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <a href="../index.html" class="w-10 h-10 rounded-2xl bg-bunta-gold flex items-center justify-center text-slate-950 shadow-lg hover:scale-105 transition">
+          <i data-lucide="store" class="w-5 h-5 text-slate-950"></i>
+        </a>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-display font-extrabold text-white">Merchant<span class="text-bunta-gold">.Bunta</span></h1>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-bunta-gold text-slate-950">PWA 2</span>
+          </div>
+          <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block -mt-0.5">
+            Portal Manajemen UMKM Kuliner Bunta
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="../index.html" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold border border-slate-700 transition flex items-center gap-1.5">
+          <i data-lucide="home" class="w-3.5 h-3.5 text-bunta-gold"></i>
+          <span>Portal Utama</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="max-w-7xl mx-auto px-4 py-8 flex-grow space-y-8">
+    
+    <!-- Merchant Overview Header -->
+    <div class="bg-gradient-to-r from-slate-900 via-slate-900 to-amber-950/40 rounded-3xl p-6 border border-slate-800 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 rounded-2xl bg-bunta-gold/20 border-2 border-bunta-gold flex items-center justify-center text-bunta-gold text-2xl font-black shadow-lg">
+          <i data-lucide="utensils-crossed" class="w-8 h-8"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 id="merchant-store-name" class="text-2xl font-display font-extrabold text-white">Dapur Kuliner Bunta</h2>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">Toko Buka</span>
+          </div>
+          <p id="merchant-store-address" class="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-bunta-gold"></i>
+            <span>Jl. Trans Sulawesi, Kecamatan Bunta, Kab. Banggai</span>
+          </p>
+          <p id="merchant-store-hours" class="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1.5">
+            <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span>Jam Operasional: 08.00 - 21.00 WITA</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+        <button onclick="openAddMenuModal()" class="w-full md:w-auto px-5 py-3 rounded-2xl bg-bunta-gradient text-white text-xs font-extrabold shadow-xl hover:opacity-90 transition flex items-center justify-center gap-2">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <span>Tambah Menu Kuliner Baru</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Merchant Tab Switcher (Catalog vs Incoming Orders - SP-007) -->
+    <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+      <button onclick="switchMerchantTab('orders')" id="tab-btn-orders" class="px-5 py-2.5 rounded-2xl bg-bunta-gold text-slate-950 text-xs font-extrabold transition flex items-center gap-2">
+        <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+        <span>Pesanan Masuk</span>
+        <span id="merchant-incoming-badge" class="px-2 py-0.5 rounded-full bg-slate-950 text-bunta-gold text-[10px] font-black">0</span>
+      </button>
+
+      <button onclick="switchMerchantTab('catalog')" id="tab-btn-catalog" class="px-5 py-2.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-2">
+        <i data-lucide="grid" class="w-4 h-4 text-bunta-gold"></i>
+        <span>Katalog Menu Kuliner</span>
+      </button>
+    </div>
+
+    <!-- Section A: Incoming Orders Panel (SP-007) -->
+    <div id="merchant-orders-panel" class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-extrabold font-display text-white flex items-center gap-2">
+          <i data-lucide="inbox" class="w-5 h-5 text-bunta-gold"></i>
+          <span>Manajemen Pesanan Masuk (Real-time Operations)</span>
+        </h3>
+        <span class="text-xs text-slate-400 font-bold">Kecamatan Bunta</span>
+      </div>
+
+      <div id="merchant-orders-list" class="space-y-4">
+        <!-- Rendered via JS -->
+      </div>
+
+      <div id="merchant-orders-empty" class="hidden bg-slate-900/60 rounded-3xl p-12 text-center space-y-3 border border-slate-800 max-w-lg mx-auto">
+        <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto text-slate-500">
+          <i data-lucide="check-circle-2" class="w-8 h-8"></i>
+        </div>
+        <h4 class="text-lg font-extrabold font-display text-white">Belum Ada Pesanan Masuk</h4>
+        <p class="text-xs text-slate-400">Pesanan dari pembeli akan muncul secara langsung di sini.</p>
+      </div>
+    </div>
+
+    <!-- Section B: Catalog Management Section (SP-003) -->
+    <div id="merchant-catalog-panel" class="hidden space-y-6">
+      
+      <!-- Quick Stats Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-slate-900/80 rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-bunta-gold/10 text-bunta-gold flex items-center justify-center">
+            <i data-lucide="grid" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">Total Menu</span>
+            <span id="stat-total-menu" class="text-lg font-extrabold text-white">0</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/80 rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">Menu Tersedia</span>
+            <span id="stat-active-menu" class="text-lg font-extrabold text-emerald-400">0</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/80 rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center">
+            <i data-lucide="slash" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">Menu Habis</span>
+            <span id="stat-unavailable-menu" class="text-lg font-extrabold text-red-400">0</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/80 rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+            <i data-lucide="layers" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">Kategori</span>
+            <span id="stat-total-categories" class="text-lg font-extrabold text-indigo-400">3</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Filter Bar -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
+          <button onclick="filterCategory('all')" id="cat-btn-all" class="cat-filter-btn px-4 py-2 rounded-xl bg-bunta-gold text-slate-950 text-xs font-extrabold transition">
+            Semua Menu
+          </button>
+          <button onclick="filterCategory('Makanan Berat')" id="cat-btn-makanan" class="cat-filter-btn px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white text-xs font-bold transition">
+            Makanan Berat
+          </button>
+          <button onclick="filterCategory('Minuman')" id="cat-btn-minuman" class="cat-filter-btn px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white text-xs font-bold transition">
+            Minuman
+          </button>
+          <button onclick="filterCategory('Camilan Khas Bunta')" id="cat-btn-camilan" class="cat-filter-btn px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white text-xs font-bold transition">
+            Camilan Khas Bunta
+          </button>
+        </div>
+      </div>
+
+      <!-- Catalog Menu Grid Container -->
+      <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Dynamic Catalog Product Cards rendered via JavaScript -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Add / Edit Menu Modal Window -->
+  <div id="menu-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div onclick="closeMenuModal()" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md modal-backdrop"></div>
+    <div class="relative w-full max-w-lg rounded-3xl glass-modal p-6 sm:p-8 shadow-2xl z-10 modal-container border border-slate-700/80">
+      
+      <button onclick="closeMenuModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="space-y-6">
+        <div class="text-center space-y-1">
+          <h3 id="modal-menu-title" class="text-2xl font-display font-extrabold text-white">Tambah Menu Kuliner Baru</h3>
+          <p class="text-xs text-slate-400">Kelola rincian item hidangan kuliner usaha Anda</p>
+        </div>
+
+        <form onsubmit="handleMenuFormSubmit(event)" class="space-y-4 text-xs">
+          <input type="hidden" id="menu-form-id" name="id">
+
+          <div class="space-y-1 text-left">
+            <label class="font-extrabold text-slate-300 block">Nama Hidangan / Menu Kuliner</label>
+            <input type="text" id="menu-form-name" name="name" required placeholder="contoh: Nasi Goreng Cakalang Bunta" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white placeholder-slate-500 focus:border-bunta-gold focus:outline-none">
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1 text-left">
+              <label class="font-extrabold text-slate-300 block">Kategori Menu</label>
+              <select id="menu-form-category" name="category" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white focus:border-bunta-gold focus:outline-none">
+                <option value="Makanan Berat">Makanan Berat</option>
+                <option value="Minuman">Minuman</option>
+                <option value="Camilan Khas Bunta">Camilan Khas Bunta</option>
+              </select>
+            </div>
+
+            <div class="space-y-1 text-left">
+              <label class="font-extrabold text-slate-300 block">Harga (Rp)</label>
+              <input type="number" id="menu-form-price" name="price" required min="1000" placeholder="25000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white placeholder-slate-500 focus:border-bunta-gold focus:outline-none">
+            </div>
+          </div>
+
+          <div class="space-y-1 text-left">
+            <label class="font-extrabold text-slate-300 block">Deskripsi Menu / Porsi</label>
+            <textarea id="menu-form-desc" name="description" rows="3" placeholder="Jelaskan kelezatan hidangan..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white placeholder-slate-500 focus:border-bunta-gold focus:outline-none"></textarea>
+          </div>
+
+          <div class="space-y-1 text-left">
+            <label class="font-extrabold text-slate-300 block">Status Ketersediaan</label>
+            <select id="menu-form-available" name="available" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white focus:border-bunta-gold focus:outline-none">
+              <option value="true">Tersedia (Ready Stock)</option>
+              <option value="false">Habis / Non-aktif</option>
+            </select>
+          </div>
+
+          <button type="submit" class="w-full py-3.5 rounded-xl bg-bunta-gradient text-white font-extrabold shadow-lg hover:opacity-90 transition flex items-center justify-center gap-2">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span>Simpan Menu Kuliner</span>
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modal Window -->
+  <div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div onclick="closeDeleteModal()" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md modal-backdrop"></div>
+    <div class="relative w-full max-w-sm rounded-3xl glass-modal p-6 text-center space-y-4 shadow-2xl z-10 modal-container border border-slate-700/80">
+      <div class="w-14 h-14 rounded-full bg-red-950/60 border border-red-600/40 text-red-500 flex items-center justify-center mx-auto shadow-lg">
+        <i data-lucide="trash-2" class="w-7 h-7"></i>
+      </div>
+      <h3 class="text-xl font-extrabold font-display text-white">Hapus Menu Ini?</h3>
+      <p class="text-xs text-slate-400">Item menu kuliner ini akan dihapus permanen dari daftar katalog usaha Anda.</p>
+      <input type="hidden" id="delete-target-id">
+
+      <div class="flex items-center gap-3 pt-2">
+        <button onclick="closeDeleteModal()" class="w-1/2 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-extrabold text-xs hover:bg-slate-700 transition">Batal</button>
+        <button onclick="confirmDeleteMenu()" class="w-1/2 py-2.5 rounded-xl bg-red-600 text-white font-extrabold text-xs shadow-lg hover:bg-red-700 transition">Ya, Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <footer class="border-t border-slate-800 bg-slate-900/60 py-6 px-4">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+      <div>
+        <span class="font-extrabold text-white">KulinerBunta.id</span> &copy; 2026 — Merchant PWA Portal (Kecamatan Bunta).
+      </div>
+      <div class="flex items-center gap-4 text-[11px]">
+        <a href="../docs/SP-007_ORDER_FULFILLMENT_DELIVERY_TRACKING_NOTIFICATION_PACKAGE.md" class="hover:text-bunta-gold transition">SP-007 Certified Spec</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- App Scripts -->
+  <script>
+    lucide.createIcons();
+  </script>
+  <script src="../js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof renderMerchantOrders === 'function') {
+        renderMerchantOrders();
+      }
+      if (typeof renderMerchantCatalog === 'function') {
+        renderMerchantCatalog();
+      }
+    });
+  </script>
+</body>
+</html>

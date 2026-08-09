@@ -551,7 +551,18 @@ function closeMerchantRegistrationModal() {
   document.body.classList.remove('overflow-hidden');
 }
 
-function submitMerchantRegistration(event) {
+function readMerchantFile(file) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.size) return reject(new Error('Dokumen wajib diunggah.'));
+    if (file.size > 750 * 1024) return reject(new Error(`${file.name} terlalu besar. Maksimal 750 KB per file.`));
+    const reader = new FileReader();
+    reader.onload = () => resolve({ name: file.name, type: file.type, size: file.size, dataUrl: reader.result });
+    reader.onerror = () => reject(new Error(`Dokumen ${file.name} gagal dibaca.`));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function submitMerchantRegistration(event) {
   event.preventDefault();
   const form = event.target;
   const data = new FormData(form);
@@ -562,6 +573,18 @@ function submitMerchantRegistration(event) {
   const category = data.get('category').trim();
   const address = data.get('address').trim();
 
+  let documents;
+  try {
+    documents = {
+      ktp: await readMerchantFile(data.get('ktpFile')),
+      selfie: await readMerchantFile(data.get('selfieFile')),
+      business: await readMerchantFile(data.get('businessFile'))
+    };
+  } catch (error) {
+    showToast(error.message, 'warning');
+    return;
+  }
+
   const merchants = getAdminMerchants();
   const merchant = {
     id: `m-${Date.now()}`,
@@ -571,6 +594,7 @@ function submitMerchantRegistration(event) {
     email,
     category,
     address,
+    documents,
     status: 'MENUNGGU_PERSETUJUAN',
     registeredAt: new Date().toISOString()
   };
@@ -671,18 +695,79 @@ function renderAdminMerchants() {
     <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
       <div class="flex items-center justify-between">
         <h4 class="font-extrabold text-white text-sm">${sanitizeHTML(m.name)}</h4>
-        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${m.status === 'AKTIF' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'} border border-slate-700">
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${m.status === 'AKTIF' ? 'bg-emerald-500/20 text-emerald-400' : m.status === 'MENUNGGU_PERSETUJUAN' || m.status === 'PERBAIKI' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400'} border border-slate-700">
           ${m.status}
         </span>
       </div>
       <p class="text-xs text-slate-400">${sanitizeHTML(m.category)} • ${sanitizeHTML(m.address)}</p>
-      <button onclick="toggleMerchantStatus('${m.id}')" class="w-full py-2 rounded-xl text-xs font-bold ${m.status === 'AKTIF' ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-emerald-600 text-white'} border border-slate-700 transition">
-        ${m.status === 'AKTIF' ? 'Nonaktifkan Merchant' : 'Aktifkan Merchant'}
-      </button>
+      ${m.status !== 'AKTIF' && m.documents ? `<button onclick="openMerchantReviewModal('${m.id}')" class="w-full py-2 rounded-xl text-xs font-extrabold bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-400/30 transition"><i data-lucide="file-search" class="w-3.5 h-3.5 inline-block mr-1"></i>Preview & KajI Dokumen</button>` : `<button onclick="toggleMerchantStatus('${m.id}')" class="w-full py-2 rounded-xl text-xs font-bold ${m.status === 'AKTIF' ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-emerald-600 text-white'} border border-slate-700 transition">${m.status === 'AKTIF' ? 'Nonaktifkan Merchant' : 'Aktifkan Merchant'}</button>`}
     </div>
   `).join('');
 
   if (window.lucide) lucide.createIcons();
+}
+
+let currentReviewMerchantId = null;
+
+function setMerchantDocumentPreview(containerId, documentData) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.textContent = '';
+  if (!documentData || !documentData.dataUrl) {
+    container.textContent = 'Tidak ada dokumen';
+    return;
+  }
+  const isPdf = documentData.type === 'application/pdf' || documentData.dataUrl.startsWith('data:application/pdf');
+  const element = document.createElement(isPdf ? 'iframe' : 'img');
+  element.src = documentData.dataUrl;
+  element.title = documentData.name || 'Dokumen merchant';
+  element.className = 'w-full h-full object-contain';
+  container.appendChild(element);
+}
+
+function openMerchantReviewModal(id) {
+  const merchant = getAdminMerchants().find(item => item.id === id);
+  const modal = document.getElementById('merchant-review-modal');
+  if (!merchant || !modal) return;
+  currentReviewMerchantId = id;
+  document.getElementById('review-merchant-name').textContent = merchant.name;
+  document.getElementById('review-merchant-meta').textContent = `${merchant.email || '-'} · Terdaftar ${new Date(merchant.registeredAt || Date.now()).toLocaleDateString('id-ID')}`;
+  document.getElementById('review-owner').textContent = merchant.ownerName || '-';
+  document.getElementById('review-contact').textContent = `${merchant.phone || '-'} · ${merchant.email || '-'}`;
+  document.getElementById('review-category').textContent = merchant.category || '-';
+  document.getElementById('review-address').textContent = merchant.address || '-';
+  document.getElementById('review-status').textContent = merchant.status || '-';
+  document.getElementById('review-date').textContent = merchant.registeredAt ? new Date(merchant.registeredAt).toLocaleString('id-ID') : '-';
+  document.getElementById('review-note').value = merchant.reviewNote || '';
+  setMerchantDocumentPreview('review-ktp-preview', merchant.documents?.ktp);
+  setMerchantDocumentPreview('review-selfie-preview', merchant.documents?.selfie);
+  setMerchantDocumentPreview('review-business-preview', merchant.documents?.business);
+  modal.classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+  if (window.lucide) lucide.createIcons();
+}
+
+function closeMerchantReviewModal() {
+  const modal = document.getElementById('merchant-review-modal');
+  if (modal) modal.classList.add('hidden');
+  document.body.classList.remove('overflow-hidden');
+  currentReviewMerchantId = null;
+}
+
+function reviewMerchantAction(status) {
+  if (!currentReviewMerchantId) return;
+  const note = document.getElementById('review-note')?.value.trim() || '';
+  const merchants = getAdminMerchants();
+  const merchant = merchants.find(item => item.id === currentReviewMerchantId);
+  if (!merchant) return;
+  merchant.status = status;
+  merchant.reviewNote = note;
+  merchant.reviewedAt = new Date().toISOString();
+  localStorage.setItem(MERCHANTS_STORE_KEY, JSON.stringify(merchants));
+  logActivity(`MERCHANT_${status}`, getSession()?.name || 'ADMIN', 'MERCHANT_REVIEW', `${status}: ${merchant.name}${note ? ` (${note})` : ''}`);
+  closeMerchantReviewModal();
+  renderAdminDashboard();
+  showToast(status === 'AKTIF' ? 'Merchant disetujui dan diaktifkan.' : status === 'DITOLAK' ? 'Pendaftaran merchant ditolak.' : 'Permintaan perbaikan dikirim ke merchant.', status === 'AKTIF' ? 'success' : 'info');
 }
 
 function toggleMerchantStatus(id) {

@@ -262,6 +262,28 @@
           <span class="font-extrabold text-slate-300 block">Alamat Usaha</span>
           <textarea name="address" required maxlength="200" rows="3" placeholder="Alamat lengkap usaha di Kecamatan Bunta" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white placeholder-slate-500 focus:border-bunta-gold focus:outline-none"></textarea>
         </label>
+        <div class="border-t border-slate-800 pt-4 space-y-3">
+          <div>
+            <h4 class="font-extrabold text-white">Upload Data Diri & Dokumen</h4>
+            <p class="text-[11px] text-slate-500">Format JPG, PNG, atau PDF. Maksimal 750 KB per file.</p>
+          </div>
+          <label class="space-y-1 text-left block">
+            <span class="font-extrabold text-slate-300 block">KTP Pemilik</span>
+            <input type="file" name="ktpFile" required accept="image/*,.pdf" class="w-full text-xs text-slate-300 file:mr-3 file:rounded-lg file:border-0 file:bg-bunta-gold file:px-3 file:py-2 file:font-bold file:text-slate-950">
+          </label>
+          <label class="space-y-1 text-left block">
+            <span class="font-extrabold text-slate-300 block">Selfie dengan KTP</span>
+            <input type="file" name="selfieFile" required accept="image/*" class="w-full text-xs text-slate-300 file:mr-3 file:rounded-lg file:border-0 file:bg-bunta-gold file:px-3 file:py-2 file:font-bold file:text-slate-950">
+          </label>
+          <label class="space-y-1 text-left block">
+            <span class="font-extrabold text-slate-300 block">NIB / Surat Keterangan Usaha</span>
+            <input type="file" name="businessFile" required accept="image/*,.pdf" class="w-full text-xs text-slate-300 file:mr-3 file:rounded-lg file:border-0 file:bg-bunta-gold file:px-3 file:py-2 file:font-bold file:text-slate-950">
+          </label>
+        </div>
+        <label class="flex items-start gap-2 text-left text-[11px] text-slate-400">
+          <input type="checkbox" name="termsAccepted" required class="mt-0.5 rounded border-slate-700 bg-slate-900 text-bunta-gold focus:ring-0">
+          <span>Saya menyatakan data dan dokumen yang dikirim benar, sah, dan bersedia mengikuti syarat kemitraan KulinerBunta.id.</span>
+        </label>
         <button type="submit" class="w-full py-3.5 rounded-xl bg-bunta-gradient text-white font-extrabold shadow-lg hover:opacity-90 transition flex items-center justify-center gap-2">
           <i data-lucide="send" class="w-4 h-4"></i>
           <span>Kirim Pendaftaran Merchant</span>

@@ -271,7 +271,11 @@ function saveCart(cartItems) {
 }
 
 function addToCart(itemId) {
-  const catalog = getMerchantCatalog();
+  const catalog = getMerchantCatalog().filter(item => {
+    if (!item.merchantId) return true;
+    const owner = getAdminMerchants().find(merchant => merchant.id === item.merchantId);
+    return owner?.status === 'AKTIF';
+  });
   const item = catalog.find(i => i.id === itemId);
   if (!item) return;
 
@@ -535,7 +539,165 @@ function merchantSetReady(orderId) {
   updateOrderStatus(orderId, 'SIAP_DIAMBIL', 'Pesanan selesai disiapkan & siap diambil kurir.');
 }
 
-/* Merchant Registration */
+/* Merchant Portal Access & Registration */
+const MERCHANT_ACCOUNTS_KEY = 'kulinerbunta_merchant_accounts';
+
+function getMerchantAccounts() {
+  try { return JSON.parse(localStorage.getItem(MERCHANT_ACCOUNTS_KEY) || '[]'); } catch (e) { return []; }
+}
+
+function saveMerchantAccounts(accounts) {
+  localStorage.setItem(MERCHANT_ACCOUNTS_KEY, JSON.stringify(accounts));
+}
+
+function getCurrentMerchant() {
+  const session = getSession();
+  if (!session || session.role !== 'merchant') return null;
+  return getAdminMerchants().find(item => item.id === session.merchantId || item.email === session.email) || null;
+}
+
+function initMerchantPortal() {
+  const gate = document.getElementById('merchant-auth-gate');
+  const main = document.getElementById('merchant-main-content');
+  const merchant = getCurrentMerchant();
+  if (!merchant) {
+    if (gate) gate.classList.remove('hidden');
+    if (main) main.style.display = 'none';
+    if (window.lucide) lucide.createIcons();
+    return;
+  }
+  if (gate) gate.classList.add('hidden');
+  if (main) main.style.display = '';
+  renderMerchantAccountState(merchant);
+  if (window.lucide) lucide.createIcons();
+}
+
+function handleMerchantLogin(event) {
+  event.preventDefault();
+  const form = event.target;
+  const email = form.email.value.trim().toLowerCase();
+  const account = getMerchantAccounts().find(item => item.email === email && item.password === form.password.value);
+  if (!account) {
+    showToast('Email atau kata sandi merchant tidak sesuai.', 'warning');
+    return;
+  }
+  setSession({ token: `merchant-${Date.now()}`, merchantId: account.merchantId, name: account.ownerName, email, role: 'merchant', roleName: 'Mitra UMKM Kuliner', loginTime: new Date().toISOString() }, true);
+  initMerchantPortal();
+  showToast('Berhasil masuk ke Portal Merchant.', 'success');
+}
+
+function openMerchantRegistrationFromGate() {
+  const gate = document.getElementById('merchant-auth-gate');
+  const main = document.getElementById('merchant-main-content');
+  if (gate) gate.classList.add('hidden');
+  if (main) main.style.display = '';
+  openMerchantRegistrationModal();
+}
+
+function handleMerchantLogout() {
+  clearSession();
+  const main = document.getElementById('merchant-main-content');
+  const gate = document.getElementById('merchant-auth-gate');
+  if (main) main.style.display = 'none';
+  if (gate) gate.classList.remove('hidden');
+  showToast('Anda telah keluar dari Portal Merchant.', 'info');
+}
+
+function renderMerchantAccountState(merchant) {
+  const name = document.getElementById('merchant-store-name');
+  const address = document.getElementById('merchant-store-address');
+  const statusBanner = document.getElementById('merchant-status-banner');
+  const statusTitle = document.getElementById('merchant-status-title');
+  const statusMessage = document.getElementById('merchant-status-message');
+  if (name) name.textContent = merchant.name || 'Merchant Baru';
+  if (address) address.lastElementChild.textContent = merchant.address || 'Alamat belum dilengkapi';
+  if (merchant.status !== 'AKTIF') {
+    statusBanner?.classList.remove('hidden');
+    if (statusTitle) statusTitle.textContent = merchant.status === 'PERBAIKI' ? 'Dokumen perlu diperbaiki' : 'Pendaftaran sedang menunggu persetujuan Admin';
+    if (statusMessage) statusMessage.textContent = merchant.reviewNote || 'Anda tetap dapat masuk dan mengubah data serta dokumen pendaftaran.';
+  } else {
+    statusBanner?.classList.add('hidden');
+  }
+}
+
+function isMerchantApproved() {
+  return getCurrentMerchant()?.status === 'AKTIF';
+}
+
+function switchMerchantTab(tab) {
+  const orders = document.getElementById('merchant-orders-panel');
+  const catalog = document.getElementById('merchant-catalog-panel');
+  if (tab === 'catalog' && !isMerchantApproved()) {
+    showToast('Katalog dan pendaftaran menu aktif setelah merchant disetujui Admin.', 'warning');
+    return;
+  }
+  orders?.classList.toggle('hidden', tab !== 'orders');
+  catalog?.classList.toggle('hidden', tab !== 'catalog');
+}
+
+function openAddMenuModal() {
+  if (!isMerchantApproved()) {
+    showToast('Merchant masih menunggu persetujuan Admin. Menu belum dapat dipublikasikan.', 'warning');
+    return;
+  }
+  document.getElementById('menu-form-id').value = '';
+  document.getElementById('modal-menu-title').textContent = 'Tambah Menu Kuliner Baru';
+  document.getElementById('menu-modal')?.classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+}
+
+function closeMenuModal() {
+  document.getElementById('menu-modal')?.classList.add('hidden');
+  document.body.classList.remove('overflow-hidden');
+}
+
+function handleMenuFormSubmit(event) {
+  event.preventDefault();
+  const merchant = getCurrentMerchant();
+  if (!merchant || merchant.status !== 'AKTIF') return showToast('Menu baru hanya dapat didaftarkan setelah disetujui Admin.', 'warning');
+  const form = event.target;
+  const item = {
+    id: `item-${Date.now()}`,
+    merchantId: merchant.id,
+    merchant: merchant.name,
+    name: form.name.value.trim(),
+    category: form.category.value,
+    price: Number(form.price.value),
+    description: form.description.value.trim(),
+    available: form.available.value === 'true',
+    image: ''
+  };
+  saveMerchantCatalog([...getMerchantCatalog(), item]);
+  closeMenuModal();
+  renderMerchantCatalog();
+  showToast('Menu berhasil didaftarkan dan tampil setelah persetujuan Admin.', 'success');
+}
+
+function filterCategory(category) {
+  document.querySelectorAll('.cat-filter-btn').forEach(button => button.classList.remove('bg-bunta-gold', 'text-slate-950'));
+  document.getElementById(`cat-btn-${category === 'all' ? 'all' : category === 'Makanan Berat' ? 'makanan' : category === 'Minuman' ? 'minuman' : 'camilan'}`)?.classList.add('bg-bunta-gold', 'text-slate-950');
+  renderMerchantCatalog(category);
+}
+
+function renderMerchantCatalog(category = 'all') {
+  const merchant = getCurrentMerchant();
+  const grid = document.getElementById('catalog-grid');
+  if (!grid || !merchant) return;
+  const items = getMerchantCatalog().filter(item => item.merchantId === merchant.id || (!item.merchantId && item.merchant === merchant.name));
+  const filtered = category === 'all' ? items : items.filter(item => item.category === category);
+  document.getElementById('stat-total-menu')?.replaceChildren(document.createTextNode(String(items.length)));
+  document.getElementById('stat-active-menu')?.replaceChildren(document.createTextNode(String(items.filter(item => item.available).length)));
+  document.getElementById('stat-unavailable-menu')?.replaceChildren(document.createTextNode(String(items.filter(item => !item.available).length)));
+  grid.innerHTML = filtered.length ? filtered.map(item => `<div class="p-4 rounded-2xl bg-slate-900 border border-slate-800"><h4 class="font-extrabold text-white">${sanitizeHTML(item.name)}</h4><p class="text-xs text-slate-400 mt-1">${sanitizeHTML(item.category)}</p><p class="text-bunta-gold font-black mt-3">Rp ${Number(item.price).toLocaleString('id-ID')}</p></div>`).join('') : '<div class="col-span-full p-8 text-center text-xs text-slate-500">Belum ada menu yang didaftarkan.</div>';
+}
+
+function renderMerchantOrders() {
+  const empty = document.getElementById('merchant-orders-empty');
+  const list = document.getElementById('merchant-orders-list');
+  if (list) list.innerHTML = '';
+  empty?.classList.remove('hidden');
+}
+
 function openMerchantRegistrationModal() {
   const modal = document.getElementById('merchant-registration-modal');
   if (!modal) return;
@@ -549,6 +711,10 @@ function closeMerchantRegistrationModal() {
   if (!modal) return;
   modal.classList.add('hidden');
   document.body.classList.remove('overflow-hidden');
+  if (!getCurrentMerchant()) {
+    document.getElementById('merchant-main-content')?.style.setProperty('display', 'none');
+    document.getElementById('merchant-auth-gate')?.classList.remove('hidden');
+  }
 }
 
 function readMerchantFile(file) {
@@ -572,6 +738,7 @@ async function submitMerchantRegistration(event) {
   const email = data.get('email').trim();
   const category = data.get('category').trim();
   const address = data.get('address').trim();
+  const password = data.get('password').trim();
 
   let documents;
   try {
@@ -586,8 +753,11 @@ async function submitMerchantRegistration(event) {
   }
 
   const merchants = getAdminMerchants();
+  const currentSession = getSession();
+  const existingMerchant = currentSession?.role === 'merchant' ? merchants.find(item => item.id === currentSession.merchantId) : null;
   const merchant = {
-    id: `m-${Date.now()}`,
+    ...(existingMerchant || {}),
+    id: existingMerchant?.id || `m-${Date.now()}`,
     name: storeName,
     ownerName,
     phone,
@@ -595,14 +765,29 @@ async function submitMerchantRegistration(event) {
     category,
     address,
     documents,
-    status: 'MENUNGGU_PERSETUJUAN',
-    registeredAt: new Date().toISOString()
+    status: existingMerchant?.status === 'AKTIF' ? 'AKTIF' : 'MENUNGGU_PERSETUJUAN',
+    registeredAt: existingMerchant?.registeredAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    reviewNote: ''
   };
 
-  localStorage.setItem(MERCHANTS_STORE_KEY, JSON.stringify([...merchants, merchant]));
+  const nextMerchants = existingMerchant ? merchants.map(item => item.id === merchant.id ? merchant : item) : [...merchants, merchant];
+  localStorage.setItem(MERCHANTS_STORE_KEY, JSON.stringify(nextMerchants));
+  const accounts = getMerchantAccounts().filter(account => account.email !== email || account.merchantId === merchant.id);
+  if (!accounts.some(account => account.merchantId === merchant.id)) {
+    accounts.push({ merchantId: merchant.id, email, password, ownerName });
+  } else {
+    const account = accounts.find(item => item.merchantId === merchant.id);
+    account.email = email;
+    account.password = password;
+    account.ownerName = ownerName;
+  }
+  saveMerchantAccounts(accounts);
+  setSession({ token: `merchant-${Date.now()}`, merchantId: merchant.id, name: ownerName, email, role: 'merchant', roleName: 'Mitra UMKM Kuliner', loginTime: new Date().toISOString() }, true);
   logActivity('MERCHANT_REGISTERED', ownerName, 'MERCHANT_ONBOARDING', `New merchant registration: ${storeName}`);
   form.reset();
   closeMerchantRegistrationModal();
+  initMerchantPortal();
   showToast('Pendaftaran merchant berhasil dikirim. Menunggu pemeriksaan Admin.', 'success');
 }
 
@@ -1043,7 +1228,11 @@ function renderConsumerCatalog() {
   const countEl = document.getElementById('catalog-results-count');
   if (!grid) return;
 
-  const catalog = getMerchantCatalog();
+  const catalog = getMerchantCatalog().filter(item => {
+    if (!item.merchantId) return true;
+    const owner = getAdminMerchants().find(merchant => merchant.id === item.merchantId);
+    return owner?.status === 'AKTIF';
+  });
   const favs = getLocalFavorites();
 
   let filtered = catalog;

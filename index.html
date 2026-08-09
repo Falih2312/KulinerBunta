@@ -72,28 +72,10 @@
         </div>
       </div>
 
-      <!-- Auth State Control & Navigation -->
-      <div class="flex items-center gap-3">
-        <!-- Guest View Controls -->
-        <div id="header-guest-view" class="flex items-center gap-2">
-          <button onclick="openAuthModal('login')" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold border border-slate-700 transition">
-            Masuk
-          </button>
-          <button onclick="openAuthModal('register')" class="px-3.5 py-1.5 rounded-xl bg-bunta-gradient text-white text-xs font-extrabold shadow-md hover:opacity-90 transition">
-            Daftar Akun
-          </button>
-        </div>
-
-        <!-- Logged-in User Drawer Button -->
-        <div id="header-user-view" class="hidden flex items-center gap-3">
-          <div class="text-right hidden sm:block">
-            <span id="user-display-name" class="block text-xs font-extrabold text-white">Nama Pengguna</span>
-            <span id="user-display-role" class="block text-[10px] font-bold text-bunta-gold">Peran Pengguna</span>
-          </div>
-          <button onclick="handleLogout()" title="Keluar" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-red-400 border border-slate-700 transition">
-            <i data-lucide="log-out" class="w-4 h-4"></i>
-          </button>
-        </div>
+      <!-- Setiap role masuk melalui portalnya sendiri. -->
+      <div class="hidden sm:flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+        <i data-lucide="layout-grid" class="w-4 h-4 text-bunta-gold"></i>
+        <span>4 Portal Terpisah</span>
       </div>
     </div>
   </header>
@@ -130,13 +112,13 @@
           <i data-lucide="layout-grid" class="w-5 h-5 text-bunta-gold"></i>
           <span>Portal Aplikasi Terintegrasi</span>
         </h3>
-        <span class="text-xs text-slate-400 font-bold">Role-Based Access Control (RBAC)</span>
+          <span class="text-xs text-slate-400 font-bold">Pilih aplikasi sesuai kebutuhan</span>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
         <!-- App Portal 1: Consumer & Tourists PWA -->
-        <div onclick="navigateProtectedPortal('./app-pembeli/index.html', 'pelanggan')" class="cursor-pointer bg-slate-900/90 rounded-3xl p-6 border border-slate-800 hover:border-bunta-red transition duration-300 flex flex-col justify-between shadow-xl group">
+        <div onclick="navigatePortal('./app-pembeli/index.html')" class="cursor-pointer bg-slate-900/90 rounded-3xl p-6 border border-slate-800 hover:border-bunta-red transition duration-300 flex flex-col justify-between shadow-xl group" role="link" tabindex="0">
           <div class="space-y-4">
             <div class="w-14 h-14 rounded-2xl bg-bunta-red/20 border border-bunta-red/40 text-bunta-red flex items-center justify-center text-2xl font-black group-hover:scale-110 transition duration-300 shadow-md">
               <i data-lucide="shopping-bag" class="w-7 h-7 text-bunta-gold"></i>
@@ -159,7 +141,7 @@
         </div>
 
         <!-- App Portal 2: Merchant PWA -->
-        <div onclick="navigateProtectedPortal('./app-merchant/index.html', 'merchant')" class="cursor-pointer bg-slate-900/90 rounded-3xl p-6 border border-slate-800 hover:border-bunta-gold transition duration-300 flex flex-col justify-between shadow-xl group">
+        <div onclick="navigatePortal('./app-merchant/index.html')" class="cursor-pointer bg-slate-900/90 rounded-3xl p-6 border border-slate-800 hover:border-bunta-gold transition duration-300 flex flex-col justify-between shadow-xl group" role="link" tabindex="0">
           <div class="space-y-4">
             <div class="w-14 h-14 rounded-2xl bg-bunta-gold/20 border border-bunta-gold/40 text-bunta-gold flex items-center justify-center text-2xl font-black group-hover:scale-110 transition duration-300 shadow-md">
               <i data-lucide="store" class="w-7 h-7 text-bunta-gold"></i>
@@ -182,7 +164,7 @@
         </div>
 
         <!-- App Portal 3: Courier PWA -->
-        <div onclick="navigateProtectedPortal('./app-kurir/index.html', 'kurir')" class="cursor-pointer bg-slate-900/90 rounded-3xl p-6 border border-slate-800 hover:border-emerald-500 transition duration-300 flex flex-col justify-between shadow-xl group">
+        <div onclick="navigatePortal('./app-kurir/index.html')" class="cursor-pointer bg-slate-900/90 rounded-3xl p-6 border border-slate-800 hover:border-emerald-500 transition duration-300 flex flex-col justify-between shadow-xl group" role="link" tabindex="0">
           <div class="space-y-4">
             <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-2xl font-black group-hover:scale-110 transition duration-300 shadow-md">
               <i data-lucide="bike" class="w-7 h-7 text-emerald-400"></i>
@@ -205,7 +187,7 @@
         </div>
 
         <!-- App Portal 4: Admin Governance PWA (SP-008) -->
-        <div onclick="navigateProtectedPortal('./app-admin/index.html', 'admin')" class="cursor-pointer bg-slate-900/90 rounded-3xl p-6 border border-slate-800 hover:border-indigo-500 transition duration-300 flex flex-col justify-between shadow-xl group">
+        <div onclick="navigatePortal('./app-admin/index.html')" class="cursor-pointer bg-slate-900/90 rounded-3xl p-6 border border-slate-800 hover:border-indigo-500 transition duration-300 flex flex-col justify-between shadow-xl group" role="link" tabindex="0">
           <div class="space-y-4">
             <div class="w-14 h-14 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 flex items-center justify-center text-2xl font-black group-hover:scale-110 transition duration-300 shadow-md">
               <i data-lucide="shield-check" class="w-7 h-7 text-indigo-400"></i>

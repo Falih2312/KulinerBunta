@@ -754,11 +754,7 @@ function initUIHandlers() {
 }
 
 function openAuthModal(view = 'login') {
-  const modal = document.getElementById('auth-modal');
-  if (!modal) return;
-  switchAuthView(view);
-  modal.classList.remove('hidden');
-  document.body.classList.add('overflow-hidden');
+  showToast('Silakan buka portal sesuai peran Anda. Launcher tidak lagi memakai login gabungan.', 'info');
 }
 
 function closeAuthModal() {
@@ -868,20 +864,7 @@ function handleLogout() {
   showToast('Anda telah keluar dari akun. Status kembali ke Tamu (Guest).', 'info');
 }
 
-function navigateProtectedPortal(portalPath, requiredRole) {
-  const session = getSession();
-
-  if (!session) {
-    showToast('Akses Dibatasi! Harap masuk terlebih dahulu untuk mengakses portal ini.', 'warning');
-    openAuthModal('login');
-    return;
-  }
-
-  if (requiredRole && session.role !== requiredRole && session.role !== 'admin') {
-    showToast(`Akses Ditolak! Akun Anda terdaftar sebagai ${session.roleName}. Portal ini membutuhkan hak akses ${requiredRole.toUpperCase()}.`, 'warning');
-    return;
-  }
-
+function navigatePortal(portalPath) {
   let target = portalPath;
   if (target.startsWith('/')) {
     const isSubfolder = window.location.pathname.includes('/app-');
@@ -891,6 +874,11 @@ function navigateProtectedPortal(portalPath, requiredRole) {
   }
 
   window.location.href = target;
+}
+
+// Backward-compatible alias for older links; portals are now independently accessible.
+function navigateProtectedPortal(portalPath) {
+  navigatePortal(portalPath);
 }
 
 function renderUserSessionUI() {

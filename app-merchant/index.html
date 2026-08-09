@@ -101,6 +101,10 @@
       </div>
 
       <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+        <button onclick="openMerchantRegistrationModal()" class="w-full md:w-auto px-5 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-bunta-gold text-xs font-extrabold border border-bunta-gold/40 transition flex items-center justify-center gap-2">
+          <i data-lucide="store" class="w-4 h-4"></i>
+          <span>Daftar Merchant Baru</span>
+        </button>
         <button onclick="openAddMenuModal()" class="w-full md:w-auto px-5 py-3 rounded-2xl bg-bunta-gradient text-white text-xs font-extrabold shadow-xl hover:opacity-90 transition flex items-center justify-center gap-2">
           <i data-lucide="plus-circle" class="w-4 h-4"></i>
           <span>Tambah Menu Kuliner Baru</span>
@@ -216,6 +220,55 @@
     </div>
 
   </main>
+
+  <!-- New Merchant Registration Modal -->
+  <div id="merchant-registration-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div onclick="closeMerchantRegistrationModal()" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md modal-backdrop"></div>
+    <div class="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-3xl glass-modal p-6 sm:p-8 shadow-2xl z-10 modal-container border border-slate-700/80">
+      <button type="button" onclick="closeMerchantRegistrationModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white transition" aria-label="Tutup">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div class="space-y-1 mb-6">
+        <span class="text-[10px] font-extrabold uppercase tracking-wider text-bunta-gold">Kemitraan Kuliner Bunta</span>
+        <h3 class="text-2xl font-display font-extrabold text-white">Daftar Merchant Baru</h3>
+        <p class="text-xs text-slate-400">Isi data usaha. Pendaftaran akan masuk ke antrean pemeriksaan Admin.</p>
+      </div>
+      <form onsubmit="submitMerchantRegistration(event)" class="space-y-4 text-xs">
+        <div class="grid sm:grid-cols-2 gap-4">
+          <label class="space-y-1 text-left">
+            <span class="font-extrabold text-slate-300 block">Nama Toko / Usaha</span>
+            <input name="storeName" required maxlength="80" placeholder="Contoh: Warung Bunta Jaya" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white placeholder-slate-500 focus:border-bunta-gold focus:outline-none">
+          </label>
+          <label class="space-y-1 text-left">
+            <span class="font-extrabold text-slate-300 block">Nama Pemilik</span>
+            <input name="ownerName" required maxlength="80" placeholder="Nama lengkap pemilik" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white placeholder-slate-500 focus:border-bunta-gold focus:outline-none">
+          </label>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <label class="space-y-1 text-left">
+            <span class="font-extrabold text-slate-300 block">Nomor WhatsApp</span>
+            <input name="phone" required maxlength="20" placeholder="08xxxxxxxxxx" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white placeholder-slate-500 focus:border-bunta-gold focus:outline-none">
+          </label>
+          <label class="space-y-1 text-left">
+            <span class="font-extrabold text-slate-300 block">Email</span>
+            <input type="email" name="email" required maxlength="120" placeholder="email@contoh.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white placeholder-slate-500 focus:border-bunta-gold focus:outline-none">
+          </label>
+        </div>
+        <label class="space-y-1 text-left block">
+          <span class="font-extrabold text-slate-300 block">Kategori Usaha</span>
+          <input name="category" required maxlength="80" placeholder="Contoh: Makanan khas, minuman, kue" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white placeholder-slate-500 focus:border-bunta-gold focus:outline-none">
+        </label>
+        <label class="space-y-1 text-left block">
+          <span class="font-extrabold text-slate-300 block">Alamat Usaha</span>
+          <textarea name="address" required maxlength="200" rows="3" placeholder="Alamat lengkap usaha di Kecamatan Bunta" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-white placeholder-slate-500 focus:border-bunta-gold focus:outline-none"></textarea>
+        </label>
+        <button type="submit" class="w-full py-3.5 rounded-xl bg-bunta-gradient text-white font-extrabold shadow-lg hover:opacity-90 transition flex items-center justify-center gap-2">
+          <i data-lucide="send" class="w-4 h-4"></i>
+          <span>Kirim Pendaftaran Merchant</span>
+        </button>
+      </form>
+    </div>
+  </div>
 
   <!-- Add / Edit Menu Modal Window -->
   <div id="menu-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">

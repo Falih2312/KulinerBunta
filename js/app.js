@@ -535,6 +535,53 @@ function merchantSetReady(orderId) {
   updateOrderStatus(orderId, 'SIAP_DIAMBIL', 'Pesanan selesai disiapkan & siap diambil kurir.');
 }
 
+/* Merchant Registration */
+function openMerchantRegistrationModal() {
+  const modal = document.getElementById('merchant-registration-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+  if (window.lucide) lucide.createIcons();
+}
+
+function closeMerchantRegistrationModal() {
+  const modal = document.getElementById('merchant-registration-modal');
+  if (!modal) return;
+  modal.classList.add('hidden');
+  document.body.classList.remove('overflow-hidden');
+}
+
+function submitMerchantRegistration(event) {
+  event.preventDefault();
+  const form = event.target;
+  const data = new FormData(form);
+  const storeName = data.get('storeName').trim();
+  const ownerName = data.get('ownerName').trim();
+  const phone = data.get('phone').trim();
+  const email = data.get('email').trim();
+  const category = data.get('category').trim();
+  const address = data.get('address').trim();
+
+  const merchants = getAdminMerchants();
+  const merchant = {
+    id: `m-${Date.now()}`,
+    name: storeName,
+    ownerName,
+    phone,
+    email,
+    category,
+    address,
+    status: 'MENUNGGU_PERSETUJUAN',
+    registeredAt: new Date().toISOString()
+  };
+
+  localStorage.setItem(MERCHANTS_STORE_KEY, JSON.stringify([...merchants, merchant]));
+  logActivity('MERCHANT_REGISTERED', ownerName, 'MERCHANT_ONBOARDING', `New merchant registration: ${storeName}`);
+  form.reset();
+  closeMerchantRegistrationModal();
+  showToast('Pendaftaran merchant berhasil dikirim. Menunggu pemeriksaan Admin.', 'success');
+}
+
 /* Courier Actions (SP-007) */
 function courierAcceptDelivery(orderId) {
   updateOrderStatus(orderId, 'DIANTAR', 'Kurir mengambil tugas pengantaran.');
